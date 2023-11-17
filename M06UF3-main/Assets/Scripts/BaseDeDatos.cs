@@ -4,59 +4,91 @@ using UnityEngine;
 using System.Data;
 using Mono.Data.Sqlite;
 using Unity.VisualScripting;
-class Plant
-{
-    public int id_plant = 0;
-    public string name = "";
-    public float time = 0.0f;
-    public int quantity = 0;
-    public float sell = 0.00f;
-    public float buy = 0.00f;
-    public int season = 0;
-}
+
+
+
 public class BaseDeDatos : MonoBehaviour
 {
-    // ACCEDER BASE DE DATOS
-    IDbConnection connection;
-    private string dbName = "entifarm.db";
-    private string query;
-    private IDbCommand command;
-    private IDataReader reader;
-    private void Start()
+    public static BaseDeDatos Instance;
+
+
+    private void Awake()
     {
-        // ACCEDER BASE DE DATOS
-        connection = new SqliteConnection(string.Format("URI=file:{0}", dbName));
-        connection.Open();
-    }
-    private void Update()
-    {
-        GetPlants();
+        if(Instance != null && Instance != this)
+        {
+           Destroy(this.gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
     }
 
-    ArrayList GetPlants()
+    IDbConnection conn;
+
+    string dbName = "entifarm.db";
+
+    public List<plant> plants = new List<plant>();
+
+    // Start is called before the first frame update
+    void Start()
     {
-        ArrayList plants = new ArrayList();
-        query = "SELECT * FROM plants;";
-        command = connection.CreateCommand();
-        command.CommandText = query;
-        reader = command.ExecuteReader();
-        if (reader == null)
-        {
-            return plants;
-        }
+        conn = new SqliteConnection(string.Format("URI=file:{0}", dbName));
+        conn.Open();
+
+        plants = GetPlants();
+
+        PrintDebug();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    public List<plant> GetPlants()
+    {
+        IDbCommand cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT * FROM plants";
+        IDataReader reader = cmd.ExecuteReader();
 
         while (reader.Read())
         {
-            Plant p = new Plant();
-            p.id_plant = reader.GetInt32(0); // ID
-            p.name = reader.GetString(1); // NAME
-            p.time = reader.GetFloat(2); // TIME
-            p.quantity = reader.GetInt32(3); // QUANTITY
-            p.sell = reader.GetFloat(4); // SELL
-            p.buy = reader.GetFloat(5); // BUY
-                                        //p.season = reader.GetInt32(6); // SEASON
-            plants.Add(p);
+            plant plant = new plant();
+
+            plant.id_plant = reader.GetInt32(0);
+            plant.plantname = reader.GetString(1);
+            plant.time = reader.GetFloat(2);
+            plant.quantity = reader.GetInt32(3);
+            plant.sell = reader.GetFloat(4);
+            plant.buy = reader.GetFloat(5);
+            //plant.season = reader.GetInt32(6);
+
+            plants.Add(plant);
         }
         return plants;
+    }
+
+
+    public void PrintDebug ()
+    {
+        if (plants.Count == 0)
+        {
+            Debug.Log("ERROR: No plants");
+            return;
+        }
+
+        for (int i = 0; i < plants.Count; i++)
+        {
+            Debug.Log(plants[i].id_plant);
+            Debug.Log(plants[i].plantname);
+            Debug.Log(plants[i].time);
+            Debug.Log(plants[i].quantity);
+            Debug.Log(plants[i].sell);
+            Debug.Log(plants[i].buy);
+            Debug.Log(plants[i].season);
+        }
     }
 }
