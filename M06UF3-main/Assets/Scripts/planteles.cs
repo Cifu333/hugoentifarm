@@ -39,4 +39,11 @@ public class planteles : MonoBehaviour
 
     }
 
+
+    public void SetId(int id)
+    {
+        id_plant = id;
+
+    }
+
 }
