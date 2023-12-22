@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class MousePicking : MonoBehaviour
 {
+
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))

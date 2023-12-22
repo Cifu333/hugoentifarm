@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private int id_clicked;
+    public int id_clicked;
 
     // Update is called once per frame
     public void SetId(int id)
