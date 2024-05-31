@@ -10,7 +10,7 @@ using Unity.VisualScripting;
 public class BaseDeDatos : MonoBehaviour
 {
     public static BaseDeDatos Instance;
-
+    private IDataReader reader;
 
     private void Awake()
     {
@@ -91,4 +91,47 @@ public class BaseDeDatos : MonoBehaviour
             Debug.Log(plants[i].season);
         }
     }
+
+    public void NewUser(string username, string password)
+    {
+        IDbCommand cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT Into users(user, password) Values (\"" + username + "\", \"" + password + "\");";
+        reader = cmd.ExecuteReader();
+        reader.Close();
+
+
+    }
+
+    public List<users> userList = new List<users>();
+    public List<users> GetUsers()
+    {
+        IDbCommand cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT * from users;";
+        reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            users Users = new users();
+            Users.id_user = reader.GetInt32(0);
+            Users.name = reader.GetString(1);
+            Users.password = reader.GetString(2);
+            Users.password.ToString();
+            Debug.Log(Users.password);
+
+            userList.Add(Users);
+        }
+
+
+
+        return userList;
+    }
+
+
 }
+
+public class users
+{
+    public int id_user = 0;
+    public string name = "";
+    public string password = "";
+}
+
